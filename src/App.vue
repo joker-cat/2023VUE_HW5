@@ -5,7 +5,7 @@
 
 <template>
   <div class="container">
-   
+    <button class="btn btn-success">success</button>
   </div>
   <!-- <RouterView /> -->
 </template>
