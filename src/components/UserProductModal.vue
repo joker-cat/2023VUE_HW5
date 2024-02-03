@@ -15,12 +15,8 @@ export default {
       this.ctlModal.hide();
     },
     joinCart() {
-      console.log(this.productInfo);
       const apiOption = (this.productInCart.length !== 0) ? 'put' : 'post';
-      console.log(apiOption);
       const apiRoute = (apiOption === 'put') ? `/${this.productInCart[0]["product_id"]}` : '';
-      console.log(apiRoute);
-      console.log(this.productInCart);
       const data = (apiOption === 'put') ?
         {//put
           "data": {
