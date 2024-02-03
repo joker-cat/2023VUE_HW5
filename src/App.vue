@@ -7,7 +7,8 @@ export default {
     return {
       products: [], //產品
       pagination: {}, //頁數
-      productInfo: {},
+      productInfo: {}, //商品資訊
+      isLoading: false, //load時不要顯示"購物車為空"的<p>標籤
       cart: { //我的購物車
         "carts": []
       },
@@ -22,16 +23,8 @@ export default {
       load: null
     }
   },
-  created(page = 1) {
-    this.load = this.$loading.show();
-    this.$axios.get(`/products?page=${page}`)
-      .then((res) => {
-        this.products = res.data.products;
-        this.pagination = res.data.pagination;
-      })
-      .finally(() => {
-        this.load.hide();
-      })
+  created() {
+
   },
   computed: {
     originPriceTotal() {
@@ -43,6 +36,13 @@ export default {
     },
     cartsLength() {
       return this.cart.carts.length;
+    },
+    pushCartBtn() {
+      return (this.writeInfo.name.trim('') === '' ||
+        this.writeInfo.name.trim('') === '' ||
+        this.writeInfo.tel.trim('') === '' ||
+        this.writeInfo.address.trim('') === '' ||
+        this.message.trim('') === '') ? true : false;
     }
   },
   watch: {
@@ -138,13 +138,15 @@ export default {
     onSubmit() {//表單送出，驗證成功才會觸發
       this.$axios.post(`/order`, {
         data: {
-          user:{...this.writeInfo},
+          user: { ...this.writeInfo },
           message: this.message
         }
       })
         .then((res) => {
           if (res.status === 200) {
             this.toastAnimation('已建立訂單，清空購物車');
+            this.getCart();
+
           }
         })
         .catch((err) => console.log(err))
@@ -153,8 +155,19 @@ export default {
   components: {
     UserProductModal
   },
-  mounted() {
-    this.getCart();
+  mounted(page = 1) {
+    this.load = this.$loading.show();
+    this.$axios.get(`/products?page=${page}`)
+      .then((res) => {
+        this.products = res.data.products;
+        this.pagination = res.data.pagination;
+        this.getCart();
+      })
+      .catch(err => console.log(err))
+      .finally(() => {
+        this.load.hide();
+        this.isLoading = true;
+      })
   }
 }
 
@@ -206,8 +219,7 @@ export default {
         </tbody>
       </table>
       <!-- 購物車列表 -->
-      <div v-if="cart.carts.length !== 0">
-
+      <div v-if="cartsLength">
         <div class="text-end">
           <button class="btn btn-outline-danger" type="button" @click="clearCart">清空購物車</button>
         </div>
@@ -272,7 +284,7 @@ export default {
           </tfoot>
         </table>
       </div>
-      <p class="text-center fs-2 fw-bolder text-danger" v-else>購物車目前為空</p>
+      <p class="text-center fs-2 fw-bolder text-danger" v-if="(isLoading && !cartsLength)">購物車目前為空</p>
     </div>
     <div class="my-5 row justify-content-center" v-if="cart.carts.length !== 0">
       <VForm ref="form" class="col-md-6" v-slot="{ errors }">
@@ -308,7 +320,7 @@ export default {
           <textarea id="message" class="form-control" v-model="message" cols="30" rows="10"></textarea>
         </div>
         <div class="text-end">
-          <button type="button" class="btn btn-danger" @click="onSubmit">送出訂單</button>
+          <button type="button" class="btn btn-danger" @click="onSubmit" :disabled="pushCartBtn">送出訂單</button>
         </div>
       </VForm>
     </div>

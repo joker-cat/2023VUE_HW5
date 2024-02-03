@@ -29,7 +29,7 @@ export default {
             "product_id": this.productInfo.id,
             "qty": this.count
           }
-        }
+        };
       this.$axios[apiOption]('/cart' + apiRoute, data)
         .then((res) => {
           this.$emit('emitToast', ((apiOption === 'put') ? '數量成功累加' : '成功加入購物車'));
