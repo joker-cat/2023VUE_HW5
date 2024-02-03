@@ -30,7 +30,6 @@ export default {
             "qty": this.count
           }
         };
-      console.log('/cart' + apiRoute, data);
 
       this.$axios[apiOption]('/cart' + apiRoute, data)
         .then((res) => {
