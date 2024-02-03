@@ -94,6 +94,9 @@ export default {
         .catch((err) => console.log(err))
     },
     changeCount(event, product) { //更改購物車商品數量
+      if (Number(event.target.value) === 0 || event.target.value.trim() === '') {
+        event.target.value = 1;
+      }
       this.$axios.put(`/cart/${product.id}`, {
         "data": {
           "product_id": product.id,
