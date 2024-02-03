@@ -15,8 +15,12 @@ export default {
       this.ctlModal.hide();
     },
     joinCart() {
-      const apiOption = (this.productInCart.length) ? 'put' : 'post';
+      console.log(this.productInfo);
+      const apiOption = (this.productInCart.length !== 0) ? 'put' : 'post';
+      console.log(apiOption);
       const apiRoute = (apiOption === 'put') ? `/${this.productInCart[0]["product_id"]}` : '';
+      console.log(apiRoute);
+      console.log(this.productInCart);
       const data = (apiOption === 'put') ?
         {//put
           "data": {
@@ -26,10 +30,12 @@ export default {
         } :
         {//post
           "data": {
-            "product_id": this.productInfo.id,
+            "product_id": this.productInfo["id"],
             "qty": this.count
           }
         };
+      console.log('/cart' + apiRoute, data);
+
       this.$axios[apiOption]('/cart' + apiRoute, data)
         .then((res) => {
           this.$emit('emitToast', ((apiOption === 'put') ? '數量成功累加' : '成功加入購物車'));
@@ -41,7 +47,7 @@ export default {
   },
   computed: {
     productInCart() { //是否已存在購物車
-      return this.cart.filter((icart) => (icart.product.id === this.productInfo.id));
+      return this.cart.filter((icart) => (icart.id === this.productInfo.id));
     }
   },
   mounted() {
