@@ -38,7 +38,7 @@ export default {
     },
     pushCartBtn() {
       return this.writeInfo.name.trim('') === '' ||
-        this.writeInfo.name.trim('') === '' ||
+        this.writeInfo.email.trim('') === '' ||
         this.writeInfo.tel.trim('') === '' ||
         this.writeInfo.address.trim('') === ''
         ? true
@@ -153,21 +153,26 @@ export default {
       })
     },
     onSubmit() {
-      //表單送出，驗證成功才會觸發
-      this.$axios
-        .post(`/order`, {
-          data: {
-            user: { ...this.writeInfo },
-            message: this.message.trim()
-          }
-        })
-        .then((res) => {
-          if (res.status === 200) {
-            this.toastAnimation('已建立訂單，清空購物車')
-            this.getCart()
-          }
-        })
-        .catch((err) => console.log(err))
+      this.$refs.form.validate().then((isValid) => {
+        if (isValid.valid) {
+          this.$axios
+            .post(`/order`, {
+              data: {
+                user: { ...this.writeInfo },
+                message: this.message.trim()
+              }
+            })
+            .then((res) => {
+              if (res.status === 200) {
+                this.toastAnimation('已建立訂單，清空購物車')
+                this.getCart()
+              }
+            })
+            .catch((err) => console.log(err))
+        } else {
+          this.toastAnimation('驗證失敗，請確保欄位格式正確')
+        }
+      })
     }
   },
   components: {
@@ -399,6 +404,7 @@ export default {
         </div>
         <div class="text-end">
           <button type="button" class="btn btn-danger" @click="onSubmit" :disabled="pushCartBtn">
+            <!-- <button type="submit" class="btn btn-danger" :disabled="pushCartBtn" @click="onSubmit"> -->
             送出訂單
           </button>
         </div>
